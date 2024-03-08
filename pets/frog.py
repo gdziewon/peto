@@ -1,12 +1,14 @@
-from pets.pet import Pet
+from pets.pet_base import Pet
+from pets.actions.playing import play_action
+from pets.actions.eating import eat_action
+from utils.constants import INITIAL_JUMP_HEIGHT, PREFERRED_FOOD_FROG
 
 
 class Frog(Pet):
     def __init__(self, name: str):
         super().__init__(name)
-        self.species = "frog"
-        self.preferred_food = ['.jpg', '.jpeg', '.png']
-        self.jump_height = 10
+        self.preferred_food = PREFERRED_FOOD_FROG
+        self._jump_height = INITIAL_JUMP_HEIGHT
 
     def show(self):
         super().show()
@@ -14,10 +16,19 @@ class Frog(Pet):
         return
 
     def eat(self):
-        super().eat()
+        eat_action(self)
         return
 
     def play(self, toy):
         print(f"{self.name} is jumping around")
-        super().play(toy)
+        play_action(self, toy)
         return
+
+    @property
+    def jump_height(self):
+        return self._jump_height
+
+    @jump_height.setter
+    def jump_height(self, value):
+        value = Pet.get_correct_value(value)
+        self._jump_height = value
