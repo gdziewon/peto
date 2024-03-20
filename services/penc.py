@@ -2,15 +2,16 @@ import os
 import json
 from pets.pet_base import Pet
 from services.pet_factory import PetFactory
+from utils.constants import PENC_FILE_EXTENSION
 
 
 class Penc:
     def __init__(self, directory: str):
         self._name = directory
         self._directory = os.path.abspath(directory)
-        self._penc_file = os.path.join(self.directory, ".penc")
+        self._penc_file = os.path.join(self.directory, PENC_FILE_EXTENSION)
 
-    def create(self):
+    def create_penc(self):
         try:
             os.makedirs(self.directory, exist_ok=True)
             if not os.path.exists(self.penc_file):
@@ -20,15 +21,42 @@ class Penc:
         except Exception as e:
             print(f"Error creating penc: {e}")
 
-    def add_pet(self, pet) -> bool:
+    def _read_pets(self) -> list[dict]:
+        try:
+            with open(self.penc_file, 'r') as f:
+                pet_dicts = json.load(f)
+            return pet_dicts
+        except FileNotFoundError:
+            print("Penc file not found.")
+            return []
+
+    def _write_pets(self, pets: list[dict]):
+        try:
+            with open(self.penc_file, 'w') as f:
+                json.dump(pets, f)
+        except FileNotFoundError:
+            print("Penc file not found.")
+            return
+
+    def add_pet(self, pet: Pet) -> bool:
         pets = self._read_pets()
         if any(pet.name == p["_name"] for p in pets):
             print(f"Pet {pet.name} already exists in penc {self.name}.")
             return False
         pets.append(pet.__dict__)
-        with open(self.penc_file, 'w') as f:
-            json.dump(pets, f)
+        self._write_pets(pets)
         return True
+
+    def kill_pet(self, pet_name: str):
+        pets = self._read_pets()
+        for i, pet in enumerate(pets):
+            if pet['_name'] == pet_name:
+                pets.pop(i)
+                break
+        else:
+            print(f"Pet {pet_name} not found.")
+            return
+        self._write_pets(pets)
 
     def get_all_pets(self) -> list[Pet]:
         try:
@@ -44,16 +72,7 @@ class Penc:
             print("Penc file not found.")
             return []
 
-    def _read_pets(self) -> list[dict]:
-        try:
-            with open(self.penc_file, 'r') as f:
-                pet_dicts = json.load(f)
-            return pet_dicts
-        except FileNotFoundError:
-            print("Penc file not found.")
-            return []
-
-    def update_pet(self, updated_pet: Pet):
+    def update_pet_state(self, updated_pet: Pet):
         pets = self._read_pets()
         for i, pet in enumerate(pets):
             if pet['_name'] == updated_pet.name:
@@ -62,17 +81,14 @@ class Penc:
         else:
             print(f"Pet {updated_pet.name} not found.")
             return
-        print(updated_pet.__dict__)
-        print(pets)
-        with open(self.penc_file, 'w') as f:
-            json.dump(pets, f)
+        self._write_pets(pets)
 
-    def get_pet(self, name) -> Pet or None:
+    def get_pet(self, pet_name: str) -> Pet or None:
         pets = self.get_all_pets()
         for pet in pets:
-            if pet.name == name:
+            if pet.name == pet_name:
                 return pet
-        print(f"Pet {name} not found in penc {self.name}.")
+        print(f"Pet {pet_name} not found in penc {self.name}.")
         return None
 
     # Getters

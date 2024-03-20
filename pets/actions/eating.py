@@ -1,7 +1,8 @@
 import os
 import random
 import hashlib
-from utils.constants import NUTRITIONAL_VALUE_THRESHOLD, HAMMING_DISTANCE_THRESHOLD, FOOD_DIVIDER_FROG, FOOD_DIVIDER_TURTLE
+from utils.constants import NUTRITIONAL_VALUE_THRESHOLD, HAMMING_DISTANCE_THRESHOLD, FOOD_DIVIDER_FROG, \
+    FOOD_DIVIDER_TURTLE, PENC_FILE_EXTENSION, FOOD_DIVIDER_CROCODILE
 
 
 def generate_food_hash(food_path: str) -> str:
@@ -33,7 +34,7 @@ def will_eat(pet, food_name: str, nutritional_value: int, food_hash: str) -> boo
 
 def get_food(pet) -> str or None:
     print(f"{pet.name} is looking for food: {pet.preferred_food}")
-    food_options = [f for f in os.listdir() if f.endswith(tuple(pet.preferred_food)) and f != ".penc"]
+    food_options = [f for f in os.listdir() if f.endswith(tuple(pet.preferred_food)) and f != PENC_FILE_EXTENSION]
     if not food_options:
         return None, None
     food_name = random.choice(food_options)
@@ -52,6 +53,8 @@ def get_food_divider(pet):
         return FOOD_DIVIDER_FROG
     elif pet.species == "Turtle":
         return FOOD_DIVIDER_TURTLE
+    elif pet.species == "Crocodile":
+        return FOOD_DIVIDER_CROCODILE
     else:
         print(f"Unknown species {pet.species}")
         return 0

@@ -1,5 +1,6 @@
-from utils.constants import INITIAL_HEALTH, INITIAL_AGE, INITIAL_MOOD, INITIAL_HUNGER
+from utils.constants import INITIAL_HEALTH, INITIAL_AGE, INITIAL_MOOD, INITIAL_HUNGER, HUNGER_GAIN_RATE, MOOD_LOSS_RATE, HEALTH_LOSS_RATE
 from abc import ABC, abstractmethod
+import time
 
 
 class Pet(ABC):
@@ -13,15 +14,31 @@ class Pet(ABC):
         self._preferred_food = None
         self._stomach = []
         self._memory = []
+        self._last_update = time.time()
 
     @abstractmethod
     def show(self) -> None:
+        self.update()
         print(f"Name: {self.name}")
         print(f"Species: {self.species}")
-        print(f"Age: {self.age}")
-        print(f"Health: {self.health}/100")
-        print(f"Mood: {self.mood}/100")
-        print(f"Hunger: {self.hunger}/100")
+        print(f"Age: {int(self.age)}")
+        print(f"Health: {int(self.health)}/100")
+        print(f"Mood: {int(self.mood)}/100")
+        print(f"Hunger: {int(self.hunger)}/100")
+
+    @abstractmethod
+    def update(self):
+        current_time = time.time()
+        elapsed_time = current_time - self.last_update
+
+        hunger_gain = elapsed_time * HUNGER_GAIN_RATE
+        if hunger_gain + self.hunger > 100:
+            self.health -= (hunger_gain + self.hunger - 100) * HEALTH_LOSS_RATE
+        self.hunger += hunger_gain
+
+        self.mood -= elapsed_time * MOOD_LOSS_RATE
+
+        self.last_update = current_time
 
     @abstractmethod
     def eat(self) -> None:
@@ -76,6 +93,10 @@ class Pet(ABC):
     def memory(self):
         return self._memory
 
+    @property
+    def last_update(self):
+        return self._last_update
+
     # Setters
     @name.setter
     def name(self, value: str):
@@ -90,7 +111,7 @@ class Pet(ABC):
         self._health = value
 
     @age.setter
-    def age(self, value: int):
+    def age(self, value: float):
         self._age = value
 
     @mood.setter
@@ -114,3 +135,7 @@ class Pet(ABC):
     @memory.setter
     def memory(self, value: list[str]):
         self._memory = value
+
+    @last_update.setter
+    def last_update(self, value: float):
+        self._last_update = value

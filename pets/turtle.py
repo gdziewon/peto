@@ -16,11 +16,12 @@ class Turtle(Pet):
 
     def eat(self):
         eat_action(self)
-        return
 
     def play(self, toy: str):
         print(f"{self.name} is too slow to play")
-        return
+
+    def update(self):
+        super().update()
 
     @property
     def shell_strength(self):

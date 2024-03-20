@@ -1,6 +1,5 @@
 import argparse
-from services.penc_operations import list_pets, add_pet, feed_pet, play_with_pet, \
-    create_penc, show_pet
+from services.penc_operations import PencOperations
 
 
 def peto():
@@ -13,10 +12,8 @@ def peto():
     subparsers.add_parser('list', help='List all pets in the current penc')
 
     add_parser = subparsers.add_parser('add', help='Add a pet to the current penc')
+    add_parser.add_argument('species', help='The species of the pet to add')
     add_parser.add_argument('pet_name', help='The name of the pet to add')
-    group = add_parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--turtle', action='store_true', help='Add a Turtle pet')
-    group.add_argument('--frog', action='store_true', help='Add a Frog pet')
 
     show_parser = subparsers.add_parser('show', help='Show a specific pet')
     show_parser.add_argument('pet_name', help='The name of the pet to show')
@@ -28,22 +25,28 @@ def peto():
     play_parser.add_argument('pet_name', help='The name of the pet to play with')
     play_parser.add_argument('toy', help='URL of the toy to play with')
 
+    kill_parser = subparsers.add_parser('kill', help='Kill a specific pet')
+    kill_parser.add_argument('pet_name', help='The name of the pet to kill')
+
     args = parser.parse_args()
 
+    penc_op = PencOperations()
     if args.command == 'penc':
-        penc = create_penc(args.penc_name)
+        penc = PencOperations.create_penc(args.penc_name)
         if not penc:
             print("Error creating penc.")
     elif args.command == 'list':
-        list_pets()
+        penc_op.list_pets()
     elif args.command == 'add':
-        add_pet(args.pet_name, [args.turtle, args.frog])
+        penc_op.add_pet(args.pet_name, args.species)
     elif args.command == 'show':
-        show_pet(args.pet_name)
+        penc_op.show_pet(args.pet_name)
     elif args.command == 'feed':
-        feed_pet(args.pet_name)
+        penc_op.feed_pet(args.pet_name)
     elif args.command == 'play':
-        play_with_pet(args.pet_name, args.toy)
+        penc_op.play_with_pet(args.pet_name, args.toy)
+    elif args.command == 'kill':
+        penc_op.kill_pet(args.pet_name)
     else:
         parser.print_help()
 

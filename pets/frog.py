@@ -13,16 +13,16 @@ class Frog(Pet):
     def show(self):
         super().show()
         print(f"Jump height: {self.jump_height}/100")
-        return
 
     def eat(self):
         eat_action(self)
-        return
 
     def play(self, toy):
         print(f"{self.name} is jumping around")
         play_action(self, toy)
-        return
+
+    def update(self):
+        super().update()
 
     @property
     def jump_height(self):
