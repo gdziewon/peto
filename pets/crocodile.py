@@ -30,5 +30,5 @@ class Crocodile(Pet):
 
     @bite_force.setter
     def bite_force(self, value: int):
-        value = Pet.get_correct_value(value)
+        value = Pet._get_correct_value(value)
         self._bite_force = value

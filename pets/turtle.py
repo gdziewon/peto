@@ -29,5 +29,5 @@ class Turtle(Pet):
 
     @shell_strength.setter
     def shell_strength(self, value: int):
-        value = Pet.get_correct_value(value)
+        value = Pet._get_correct_value(value)
         self._shell_strength = value

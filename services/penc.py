@@ -58,6 +58,14 @@ class Penc:
             return
         self._write_pets(pets)
 
+    def kill_all_pets(self):
+        try:
+            with open(self.penc_file, 'w') as f:
+                json.dump([], f)
+        except FileNotFoundError:
+            print("Penc file not found.")
+            return
+
     def get_all_pets(self) -> list[Pet]:
         try:
             pet_dicts = self._read_pets()

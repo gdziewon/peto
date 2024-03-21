@@ -23,6 +23,13 @@ class PencOperations:
         else:
             print("No penc available to get pet from.")
 
+    def _get_pet_names(self) -> list[str]:
+        if self.penc:
+            return [pet.name for pet in self.penc.get_all_pets()]
+        else:
+            print("No penc available to get pet names from.")
+            return []
+
     @staticmethod
     def create_penc(penc_name: str = None) -> Penc:
         penc_name = penc_name if penc_name else "."
@@ -32,11 +39,11 @@ class PencOperations:
 
     def list_pets(self):
         if self.penc:
-            pets = self.penc.get_all_pets()
+            pets = self._get_pet_names()
             if pets:
                 print("Pets in this penc:")
                 for pet in pets:
-                    print(pet.name)
+                    print(pet)
             else:
                 print("No pets found in this penc.")
 
@@ -58,6 +65,14 @@ class PencOperations:
         if pet:
             pet.show()
 
+    def show_all_pets(self):
+        pets = self._get_pet_names()
+        if pets:
+            for pet in pets:
+                self.show_pet(pet)
+        else:
+            print("No pets found in this penc.")
+
     def feed_pet(self, pet_name: str):
         pet = self._get_pet(pet_name)
         if pet:
@@ -73,6 +88,10 @@ class PencOperations:
             print(f"Played with {pet_name} using {toy}.")
 
     def kill_pet(self, pet_name: str):
+        if self._get_pet(pet_name) is None:
+            print(f"Pet {pet_name} not found.")
+            return
+
         print(f"Are you sure you want to kill {pet_name}? This action cannot be undone.")
         confirmation = input("Kill [y/N]: ")
         if confirmation.lower() != "y":
@@ -80,3 +99,21 @@ class PencOperations:
             return
         self.penc.kill_pet(pet_name)
         print(f"You monster, you killed {pet_name}. RIP.")
+
+    def kill_all_pets(self):
+        pets = self._get_pet_names()
+        if not pets:
+            print("No pets found in this penc.")
+            return
+
+        print("Are you sure you want to kill all pets? This action cannot be undone.")
+        print("Pets to be killed:")
+        for pet in pets:
+            print(pet)
+        confirmation = input("\nKill all [y/N]: ")
+        if confirmation.lower() != "y":
+            print("Killing aborted. All pets are safe.")
+            return
+        self.penc.kill_all_pets()
+        print("You disgust me, you killed all the pets...")
+        print("RIP.")

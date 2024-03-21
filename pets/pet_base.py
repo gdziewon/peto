@@ -1,6 +1,8 @@
 from utils.constants import INITIAL_HEALTH, INITIAL_AGE, INITIAL_MOOD, INITIAL_HUNGER, HUNGER_GAIN_RATE, MOOD_LOSS_RATE, HEALTH_LOSS_RATE
 from abc import ABC, abstractmethod
 import time
+from pets.art.art_dict import art
+import random
 
 
 class Pet(ABC):
@@ -15,10 +17,13 @@ class Pet(ABC):
         self._stomach = []
         self._memory = []
         self._last_update = time.time()
+        self._body = random.choice(art[self.species]['body'])
+        self._emoji = art[self.species]['emoji']
 
     @abstractmethod
     def show(self) -> None:
         self.update()
+        print(self.body)
         print(f"Name: {self.name}")
         print(f"Species: {self.species}")
         print(f"Age: {int(self.age)}")
@@ -32,8 +37,7 @@ class Pet(ABC):
         elapsed_time = current_time - self.last_update
 
         hunger_gain = elapsed_time * HUNGER_GAIN_RATE
-        if hunger_gain + self.hunger > 100:
-            self.health -= (hunger_gain + self.hunger - 100) * HEALTH_LOSS_RATE
+        self.health -= (self.hunger + hunger_gain - 100) * elapsed_time * HEALTH_LOSS_RATE
         self.hunger += hunger_gain
 
         self.mood -= elapsed_time * MOOD_LOSS_RATE
@@ -49,7 +53,7 @@ class Pet(ABC):
         pass
 
     @staticmethod
-    def get_correct_value(value: int) -> int:
+    def _get_correct_value(value: int) -> int:
         if value > 100:
             value = 100
         elif value < 0:
@@ -97,9 +101,18 @@ class Pet(ABC):
     def last_update(self):
         return self._last_update
 
+    @property
+    def body(self):
+        return self._body
+
+    @property
+    def emoji(self):
+        return self._emoji
+
     # Setters
     @name.setter
     def name(self, value: str):
+        value = value.strip()
         self._name = value
 
     @species.setter
@@ -108,6 +121,7 @@ class Pet(ABC):
 
     @health.setter
     def health(self, value: int):
+        value = Pet._get_correct_value(value)
         self._health = value
 
     @age.setter
@@ -116,12 +130,12 @@ class Pet(ABC):
 
     @mood.setter
     def mood(self, value: int):
-        value = Pet.get_correct_value(value)
+        value = Pet._get_correct_value(value)
         self._mood = value
 
     @hunger.setter
     def hunger(self, value: int):
-        value = Pet.get_correct_value(value)
+        value = Pet._get_correct_value(value)
         self._hunger = value
 
     @preferred_food.setter
@@ -139,3 +153,11 @@ class Pet(ABC):
     @last_update.setter
     def last_update(self, value: float):
         self._last_update = value
+
+    @body.setter
+    def body(self, value: str):
+        self._body = value
+
+    @emoji.setter
+    def emoji(self, value: str):
+        self._emoji = value

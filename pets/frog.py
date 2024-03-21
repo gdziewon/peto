@@ -30,5 +30,5 @@ class Frog(Pet):
 
     @jump_height.setter
     def jump_height(self, value):
-        value = Pet.get_correct_value(value)
+        value = Pet._get_correct_value(value)
         self._jump_height = value
