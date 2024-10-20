@@ -1,12 +1,19 @@
+import hashlib
 import os
 import random
-import hashlib
-from utils.constants import NUTRITIONAL_VALUE_THRESHOLD, HAMMING_DISTANCE_THRESHOLD, FOOD_DIVIDER_FROG, \
-    FOOD_DIVIDER_TURTLE, PENC_FILE_EXTENSION, FOOD_DIVIDER_CROCODILE
+
+from utils.constants import (
+    FOOD_DIVIDER_CROCODILE,
+    FOOD_DIVIDER_FROG,
+    FOOD_DIVIDER_TURTLE,
+    HAMMING_DISTANCE_THRESHOLD,
+    NUTRITIONAL_VALUE_THRESHOLD,
+    PENC_FILE_EXTENSION,
+)
 
 
 def generate_food_hash(food_path: str) -> str:
-    with open(food_path, 'rb') as f:
+    with open(food_path, "rb") as f:
         food_hash = hashlib.sha256(f.read()).hexdigest()
     return food_hash
 
@@ -22,19 +29,25 @@ def is_hash_similar(hash1: str, hash2: str) -> bool:
 
 def will_eat(pet, food_name: str, nutritional_value: int, food_hash: str) -> bool:
     if nutritional_value > pet.hunger * NUTRITIONAL_VALUE_THRESHOLD:
-        print(f"{pet.name} is not hungry enough to eat {food_name} ({nutritional_value} nutritional value)")
+        print(
+            f"{pet.name} is not hungry enough to eat {food_name} ({nutritional_value} nutritional value)"
+        )
         return False
 
     for food in pet.stomach:
-        if is_hash_similar(food_hash, food['hash']) or food_name == food['food_name']:
+        if is_hash_similar(food_hash, food["hash"]) or food_name == food["food_name"]:
             print(f"{pet.name} doesn't want to eat {food_name} again")
             return False
     return True
 
 
-def get_food(pet) -> str or None:
+def get_food(pet) -> str:
     print(f"{pet.name} is looking for food: {pet.preferred_food}")
-    food_options = [f for f in os.listdir() if f.endswith(tuple(pet.preferred_food)) and f != PENC_FILE_EXTENSION]
+    food_options = [
+        f
+        for f in os.listdir()
+        if f.endswith(tuple(pet.preferred_food)) and f != PENC_FILE_EXTENSION
+    ]
     if not food_options:
         return None, None
     food_name = random.choice(food_options)
@@ -79,5 +92,5 @@ def eat_action(pet):
     print(f"{pet.name} is eating {food_name} ({nutritional_value} nutritional value)")
     change_hunger(pet, nutritional_value)
 
-    pet.stomach.append({'food_name': food_name, 'hash': food_hash})
+    pet.stomach.append({"food_name": food_name, "hash": food_hash})
     os.remove(food_path)

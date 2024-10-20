@@ -1,7 +1,7 @@
-from pets.pet_base import Pet
-from pets.frog import Frog
-from pets.turtle import Turtle
 from pets.crocodile import Crocodile
+from pets.frog import Frog
+from pets.pet_base import Pet
+from pets.turtle import Turtle
 
 
 class PetFactory:
@@ -11,10 +11,10 @@ class PetFactory:
             "turtle": Turtle,
             "frog": Frog,
             "crocodile": Crocodile,
-            "croc": Crocodile
+            "croc": Crocodile,
         }
 
-    def create(self, species: str) -> Pet or None:
+    def create(self, species: str) -> Pet:
         species = species.lower()
         if species in self._species_map:
             return self._species_map[species](self._pet_name)

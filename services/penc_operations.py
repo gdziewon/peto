@@ -1,6 +1,8 @@
-from services.penc import Penc
 import os
+
 from pets.pet_base import Pet
+
+from services.penc import Penc
 from services.pet_factory import PetFactory
 
 
@@ -9,7 +11,7 @@ class PencOperations:
         self.penc = self._get_current_penc()
 
     @staticmethod
-    def _get_current_penc() -> Penc or None:
+    def _get_current_penc() -> Penc:
         current_dir = os.getcwd()
         penc_file = os.path.join(current_dir, ".penc")
         if os.path.exists(penc_file):
@@ -92,7 +94,9 @@ class PencOperations:
             print(f"Pet {pet_name} not found.")
             return
 
-        print(f"Are you sure you want to kill {pet_name}? This action cannot be undone.")
+        print(
+            f"Are you sure you want to kill {pet_name}? This action cannot be undone."
+        )
         confirmation = input("Kill [y/N]: ")
         if confirmation.lower() != "y":
             print(f"Killing aborted. {pet_name} is safe.")

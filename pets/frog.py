@@ -1,7 +1,8 @@
-from pets.pet_base import Pet
-from pets.actions.playing import play_action
-from pets.actions.eating import eat_action
 from utils.constants import INITIAL_JUMP_HEIGHT, PREFERRED_FOOD_FROG
+
+from pets.actions.eating import eat_action
+from pets.actions.playing import play_action
+from pets.pet_base import Pet
 
 
 class Frog(Pet):

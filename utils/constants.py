@@ -1,4 +1,3 @@
-
 # pets/pet_base.py
 INITIAL_HEALTH = 100.0
 INITIAL_AGE = 0.0
@@ -11,15 +10,15 @@ AGE_GAIN_RATE = 0.05
 
 
 # pets/frog.py
-PREFERRED_FOOD_FROG = ['.jpg', '.jpeg', '.png']
+PREFERRED_FOOD_FROG = [".jpg", ".jpeg", ".png"]
 INITIAL_JUMP_HEIGHT = 10
 
 # pets/turtle.py
-PREFERRED_FOOD_TURTLE = ['.txt', '.docx', '.pdf']
+PREFERRED_FOOD_TURTLE = [".txt", ".docx", ".pdf"]
 INITIAL_SHELL_STRENGTH = 10
 
 # pets/crocodile.py
-PREFERRED_FOOD_CROCODILE = ['.exe', '.py', '.sh']
+PREFERRED_FOOD_CROCODILE = [".exe", ".py", ".sh"]
 INITIAL_BITE_FORCE = 20
 
 # pets/actions/eating.py

@@ -1,5 +1,12 @@
 import requests
-from utils.constants import MOOD_INCREASE_DIVIDER, CODE_404_DECREASE, CODE_403_DECREASE, CODE_500_DECREASE, CODE_OTHER_DECREASE, DEFAULT_DECREASE
+from utils.constants import (
+    CODE_403_DECREASE,
+    CODE_404_DECREASE,
+    CODE_500_DECREASE,
+    CODE_OTHER_DECREASE,
+    DEFAULT_DECREASE,
+    MOOD_INCREASE_DIVIDER,
+)
 
 
 def is_valid_toy(toy: str) -> bool:

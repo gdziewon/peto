@@ -1,8 +1,10 @@
-import os
 import json
+import os
+
 from pets.pet_base import Pet
-from services.pet_factory import PetFactory
 from utils.constants import PENC_FILE_EXTENSION
+
+from services.pet_factory import PetFactory
 
 
 class Penc:
@@ -15,7 +17,7 @@ class Penc:
         try:
             os.makedirs(self.directory, exist_ok=True)
             if not os.path.exists(self.penc_file):
-                with open(self.penc_file, 'w') as f:
+                with open(self.penc_file, "w") as f:
                     json.dump([], f)
             print(f"Penc at '{self.directory}' created.")
         except Exception as e:
@@ -23,7 +25,7 @@ class Penc:
 
     def _read_pets(self) -> list[dict]:
         try:
-            with open(self.penc_file, 'r') as f:
+            with open(self.penc_file, "r") as f:
                 pet_dicts = json.load(f)
             return pet_dicts
         except FileNotFoundError:
@@ -32,7 +34,7 @@ class Penc:
 
     def _write_pets(self, pets: list[dict]):
         try:
-            with open(self.penc_file, 'w') as f:
+            with open(self.penc_file, "w") as f:
                 json.dump(pets, f)
         except FileNotFoundError:
             print("Penc file not found.")
@@ -50,7 +52,7 @@ class Penc:
     def kill_pet(self, pet_name: str):
         pets = self._read_pets()
         for i, pet in enumerate(pets):
-            if pet['_name'] == pet_name:
+            if pet["_name"] == pet_name:
                 pets.pop(i)
                 break
         else:
@@ -60,7 +62,7 @@ class Penc:
 
     def kill_all_pets(self):
         try:
-            with open(self.penc_file, 'w') as f:
+            with open(self.penc_file, "w") as f:
                 json.dump([], f)
         except FileNotFoundError:
             print("Penc file not found.")
@@ -71,7 +73,7 @@ class Penc:
             pet_dicts = self._read_pets()
             pets = []
             for pet_dict in pet_dicts:
-                pet = PetFactory(pet_dict['_name']).create(pet_dict['_species'])
+                pet = PetFactory(pet_dict["_name"]).create(pet_dict["_species"])
                 if pet:
                     pet.__dict__.update(pet_dict)
                     pets.append(pet)
@@ -83,7 +85,7 @@ class Penc:
     def update_pet_state(self, updated_pet: Pet):
         pets = self._read_pets()
         for i, pet in enumerate(pets):
-            if pet['_name'] == updated_pet.name:
+            if pet["_name"] == updated_pet.name:
                 pets[i] = updated_pet.__dict__
                 break
         else:
@@ -91,7 +93,7 @@ class Penc:
             return
         self._write_pets(pets)
 
-    def get_pet(self, pet_name: str) -> Pet or None:
+    def get_pet(self, pet_name: str) -> Pet:
         pets = self.get_all_pets()
         for pet in pets:
             if pet.name == pet_name:

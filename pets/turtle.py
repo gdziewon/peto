@@ -1,6 +1,7 @@
-from pets.pet_base import Pet
-from pets.actions.eating import eat_action
 from utils.constants import INITIAL_SHELL_STRENGTH, PREFERRED_FOOD_TURTLE
+
+from pets.actions.eating import eat_action
+from pets.pet_base import Pet
 
 
 class Turtle(Pet):
@@ -18,7 +19,7 @@ class Turtle(Pet):
         eat_action(self)
 
     def play(self, toy: str):
-        print(f"{self.name} is too slow to play")
+        print(f"{self.name} is too slow to play with {toy}")
 
     def update(self):
         super().update()

@@ -1,8 +1,18 @@
-from utils.constants import INITIAL_HEALTH, INITIAL_AGE, INITIAL_MOOD, INITIAL_HUNGER, HUNGER_GAIN_RATE, MOOD_LOSS_RATE, HEALTH_LOSS_RATE
-from abc import ABC, abstractmethod
-import time
-from pets.art.art_dict import art
 import random
+import time
+from abc import ABC, abstractmethod
+
+from utils.constants import (
+    HEALTH_LOSS_RATE,
+    HUNGER_GAIN_RATE,
+    INITIAL_AGE,
+    INITIAL_HEALTH,
+    INITIAL_HUNGER,
+    INITIAL_MOOD,
+    MOOD_LOSS_RATE,
+)
+
+from pets.art.art_dict import art
 
 
 class Pet(ABC):
@@ -17,8 +27,8 @@ class Pet(ABC):
         self._stomach = []
         self._memory = []
         self._last_update = time.time()
-        self._body = random.choice(art[self.species]['body'])
-        self._emoji = art[self.species]['emoji']
+        self._body = random.choice(art[self.species]["body"])
+        self._emoji = art[self.species]["emoji"]
 
     @abstractmethod
     def show(self) -> None:
@@ -37,7 +47,9 @@ class Pet(ABC):
         elapsed_time = current_time - self.last_update
 
         hunger_gain = elapsed_time * HUNGER_GAIN_RATE
-        self.health -= (self.hunger + hunger_gain - 100) * elapsed_time * HEALTH_LOSS_RATE
+        self.health -= (
+            (self.hunger + hunger_gain - 100) * elapsed_time * HEALTH_LOSS_RATE
+        )
         self.hunger += hunger_gain
 
         self.mood -= elapsed_time * MOOD_LOSS_RATE
