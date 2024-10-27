@@ -1,7 +1,7 @@
 [project]
 name = "peto"
 version = "0.1.0"
-description = "Add your description here"
+description = "Command line reptile enclosure"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

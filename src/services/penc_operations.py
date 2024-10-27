@@ -1,14 +1,17 @@
 import os
+from pathlib import Path
 
 from pets.pet_base import Pet
-
 from services.penc import Penc
+from services.penc_manager import PencManager
 from services.pet_factory import PetFactory
 
 
 class PencOperations:
     def __init__(self):
         self.penc = self._get_current_penc()
+        self.manager = PencManager()
+        self.reload_signal = Path(os.environ["PETO"]) / ".reload"
 
     @staticmethod
     def _get_current_penc() -> Penc:
@@ -18,6 +21,9 @@ class PencOperations:
             return Penc(current_dir)
         else:
             return None
+
+    def signal_reload(self):
+        self.reload_signal.touch()
 
     def _get_pet(self, pet_name: str) -> Pet:
         if self.penc:
@@ -32,11 +38,12 @@ class PencOperations:
             print("No penc available to get pet names from.")
             return []
 
-    @staticmethod
-    def create_penc(penc_name: str = None) -> Penc:
+    def create_penc(self, penc_name: str = None) -> Penc:
         penc_name = penc_name if penc_name else "."
         penc = Penc(penc_name)
         penc.create_penc()
+        self.manager.add_penc(penc)
+        self.signal_reload()
         return penc
 
     def list_pets(self):

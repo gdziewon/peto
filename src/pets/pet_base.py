@@ -2,6 +2,7 @@ import random
 import time
 from abc import ABC, abstractmethod
 
+from pets.art.art_dict import art
 from utils.constants import (
     HEALTH_LOSS_RATE,
     HUNGER_GAIN_RATE,
@@ -11,8 +12,6 @@ from utils.constants import (
     INITIAL_MOOD,
     MOOD_LOSS_RATE,
 )
-
-from pets.art.art_dict import art
 
 
 class Pet(ABC):
@@ -26,7 +25,6 @@ class Pet(ABC):
         self._preferred_food = None
         self._stomach = []
         self._memory = []
-        self._last_update = time.time()
         self._body = random.choice(art[self.species]["body"])
         self._emoji = art[self.species]["emoji"]
 
@@ -43,18 +41,11 @@ class Pet(ABC):
 
     @abstractmethod
     def update(self):
-        current_time = time.time()
-        elapsed_time = current_time - self.last_update
+        # TODO: enhance this
+        self.health -= (self.hunger - 100) * 6000 * HEALTH_LOSS_RATE
+        self.hunger += HUNGER_GAIN_RATE * 6000
 
-        hunger_gain = elapsed_time * HUNGER_GAIN_RATE
-        self.health -= (
-            (self.hunger + hunger_gain - 100) * elapsed_time * HEALTH_LOSS_RATE
-        )
-        self.hunger += hunger_gain
-
-        self.mood -= elapsed_time * MOOD_LOSS_RATE
-
-        self.last_update = current_time
+        self.mood -= 6000 * MOOD_LOSS_RATE
 
     @abstractmethod
     def eat(self) -> None:
@@ -110,10 +101,6 @@ class Pet(ABC):
         return self._memory
 
     @property
-    def last_update(self):
-        return self._last_update
-
-    @property
     def body(self):
         return self._body
 
@@ -161,10 +148,6 @@ class Pet(ABC):
     @memory.setter
     def memory(self, value: list[str]):
         self._memory = value
-
-    @last_update.setter
-    def last_update(self, value: float):
-        self._last_update = value
 
     @body.setter
     def body(self, value: str):

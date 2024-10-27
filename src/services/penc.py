@@ -2,9 +2,8 @@ import json
 import os
 
 from pets.pet_base import Pet
-from utils.constants import PENC_FILE_EXTENSION
-
 from services.pet_factory import PetFactory
+from utils.constants import PENC_FILE_EXTENSION
 
 
 class Penc:
@@ -14,6 +13,7 @@ class Penc:
         self._penc_file = os.path.join(self.directory, PENC_FILE_EXTENSION)
 
     def create_penc(self):
+        """Create the directory and a JSON file to store pet data."""
         try:
             os.makedirs(self.directory, exist_ok=True)
             if not os.path.exists(self.penc_file):
@@ -24,6 +24,7 @@ class Penc:
             print(f"Error creating penc: {e}")
 
     def _read_pets(self) -> list[dict]:
+        """Read the list of pets from the penc file."""
         try:
             with open(self.penc_file, "r") as f:
                 pet_dicts = json.load(f)
@@ -33,6 +34,7 @@ class Penc:
             return []
 
     def _write_pets(self, pets: list[dict]):
+        """Write the list of pets to the penc file."""
         try:
             with open(self.penc_file, "w") as f:
                 json.dump(pets, f)
@@ -40,7 +42,16 @@ class Penc:
             print("Penc file not found.")
             return
 
+    def _find_pet_index(self, pet_name: str) -> int:
+        """Find the index of a pet in the list by name."""
+        pets = self._read_pets()
+        for i, pet in enumerate(pets):
+            if pet["_name"] == pet_name:
+                return i
+        return -1
+
     def add_pet(self, pet: Pet) -> bool:
+        """Add a pet to the penc if it doesn't already exist."""
         pets = self._read_pets()
         if any(pet.name == p["_name"] for p in pets):
             print(f"Pet {pet.name} already exists in penc {self.name}.")
@@ -50,50 +61,49 @@ class Penc:
         return True
 
     def kill_pet(self, pet_name: str):
+        """Remove a pet by name from the penc."""
         pets = self._read_pets()
-        for i, pet in enumerate(pets):
-            if pet["_name"] == pet_name:
-                pets.pop(i)
-                break
+        pet_index = self._find_pet_index(pet_name)
+        if pet_index >= 0:
+            pets.pop(pet_index)
+            self._write_pets(pets)
         else:
             print(f"Pet {pet_name} not found.")
-            return
-        self._write_pets(pets)
 
     def kill_all_pets(self):
-        try:
-            with open(self.penc_file, "w") as f:
-                json.dump([], f)
-        except FileNotFoundError:
-            print("Penc file not found.")
-            return
+        """Remove all pets from the penc."""
+        self._write_pets([])
 
     def get_all_pets(self) -> list[Pet]:
-        try:
-            pet_dicts = self._read_pets()
-            pets = []
-            for pet_dict in pet_dicts:
-                pet = PetFactory(pet_dict["_name"]).create(pet_dict["_species"])
-                if pet:
-                    pet.__dict__.update(pet_dict)
-                    pets.append(pet)
-            return pets
-        except FileNotFoundError:
-            print("Penc file not found.")
-            return []
+        """Return a list of all pets in the penc."""
+        pet_dicts = self._read_pets()
+        pets = []
+        for pet_dict in pet_dicts:
+            pet = PetFactory(pet_dict["_name"]).create(pet_dict["_species"])
+            if pet:
+                pet.__dict__.update(pet_dict)
+                pets.append(pet)
+        return pets
 
     def update_pet_state(self, updated_pet: Pet):
+        """Update a specific pet's state in the penc."""
         pets = self._read_pets()
-        for i, pet in enumerate(pets):
-            if pet["_name"] == updated_pet.name:
-                pets[i] = updated_pet.__dict__
-                break
+        pet_index = self._find_pet_index(updated_pet.name)
+        if pet_index >= 0:
+            pets[pet_index] = updated_pet.__dict__
+            self._write_pets(pets)
         else:
             print(f"Pet {updated_pet.name} not found.")
-            return
-        self._write_pets(pets)
+
+    def update_all_pets(self):
+        """Update the state of all pets in the penc."""
+        pets = self.get_all_pets()
+        for pet in pets:
+            pet.update()
+            self.update_pet_state(pet)
 
     def get_pet(self, pet_name: str) -> Pet:
+        """Retrieve a pet by name from the penc."""
         pets = self.get_all_pets()
         for pet in pets:
             if pet.name == pet_name:
