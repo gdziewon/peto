@@ -1,6 +1,6 @@
 import random
-import time
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 from pets.art.art_dict import art
 from utils.constants import (
@@ -15,18 +15,30 @@ from utils.constants import (
 
 
 class Pet(ABC):
-    def __init__(self, name: str):
+    def __init__(self, name: str, directory: Path):
         self._name = name
-        self._species = self.__class__.__name__
+        self.species = self.__class__.__name__
+        self.file = directory / f"{self._name}.peto"
         self._health = INITIAL_HEALTH
-        self._age = INITIAL_AGE
+        self.age = INITIAL_AGE
         self._mood = INITIAL_MOOD
         self._hunger = INITIAL_HUNGER
-        self._preferred_food = None
-        self._stomach = []
-        self._memory = []
-        self._body = random.choice(art[self.species]["body"])
-        self._emoji = art[self.species]["emoji"]
+        self.preferred_food = None
+        self.stomach = []
+        self.memory = []
+        self.body = self.load_art()
+        self.emoji = art[self.species]["emoji"]
+        self._minutes = 0
+
+    def load_art(self) -> str:
+        if self.file.exists():
+            return self.file.read_text()
+        else:
+            body = random.choice(art[self.species]["body"])
+            return body
+
+    def save_art(self):
+        self.file.write_text(self.body)
 
     @abstractmethod
     def show(self) -> None:
@@ -41,11 +53,12 @@ class Pet(ABC):
 
     @abstractmethod
     def update(self):
-        # TODO: enhance this
-        self.health -= (self.hunger - 100) * 6000 * HEALTH_LOSS_RATE
-        self.hunger += HUNGER_GAIN_RATE * 6000
+        self.health -= (self.hunger - 50) * 1000 * HEALTH_LOSS_RATE
+        self.hunger += HUNGER_GAIN_RATE * 1000
 
-        self.mood -= 6000 * MOOD_LOSS_RATE
+        self.mood -= (2 * self.hunger) + 50 - self.health * 1000 * MOOD_LOSS_RATE
+        self._minutes += 1
+        self._age = self._minutes / 60
 
     @abstractmethod
     def eat(self) -> None:
@@ -57,102 +70,36 @@ class Pet(ABC):
 
     @staticmethod
     def _get_correct_value(value: int) -> int:
-        if value > 100:
-            value = 100
-        elif value < 0:
-            value = 0
-        return value
+        return max(0, min(value, 100))
 
-    # Getters
     @property
     def name(self):
         return self._name
 
-    @property
-    def species(self):
-        return self._species
+    @name.setter
+    def name(self, value: str):
+        self._name = value.strip()
 
     @property
     def health(self):
         return self._health
 
-    @property
-    def age(self):
-        return self._age
+    @health.setter
+    def health(self, value: int):
+        self._health = Pet._get_correct_value(value)
 
     @property
     def mood(self):
         return self._mood
 
+    @mood.setter
+    def mood(self, value: int):
+        self._mood = Pet._get_correct_value(value)
+
     @property
     def hunger(self):
         return self._hunger
 
-    @property
-    def preferred_food(self):
-        return self._preferred_food
-
-    @property
-    def stomach(self):
-        return self._stomach
-
-    @property
-    def memory(self):
-        return self._memory
-
-    @property
-    def body(self):
-        return self._body
-
-    @property
-    def emoji(self):
-        return self._emoji
-
-    # Setters
-    @name.setter
-    def name(self, value: str):
-        value = value.strip()
-        self._name = value
-
-    @species.setter
-    def species(self, value: str):
-        self._species = value
-
-    @health.setter
-    def health(self, value: int):
-        value = Pet._get_correct_value(value)
-        self._health = value
-
-    @age.setter
-    def age(self, value: float):
-        self._age = value
-
-    @mood.setter
-    def mood(self, value: int):
-        value = Pet._get_correct_value(value)
-        self._mood = value
-
     @hunger.setter
     def hunger(self, value: int):
-        value = Pet._get_correct_value(value)
-        self._hunger = value
-
-    @preferred_food.setter
-    def preferred_food(self, value: list[str]):
-        self._preferred_food = value
-
-    @stomach.setter
-    def stomach(self, value: list[str]):
-        self._stomach = value
-
-    @memory.setter
-    def memory(self, value: list[str]):
-        self._memory = value
-
-    @body.setter
-    def body(self, value: str):
-        self._body = value
-
-    @emoji.setter
-    def emoji(self, value: str):
-        self._emoji = value
+        self._hunger = Pet._get_correct_value(value)

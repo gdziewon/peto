@@ -1,13 +1,14 @@
-from utils.constants import INITIAL_BITE_FORCE, PREFERRED_FOOD_CROCODILE
+from pathlib import Path
 
 from pets.actions.eating import eat_action
 from pets.actions.playing import play_action
 from pets.pet_base import Pet
+from utils.constants import INITIAL_BITE_FORCE, PREFERRED_FOOD_CROCODILE
 
 
 class Crocodile(Pet):
-    def __init__(self, name: str):
-        super().__init__(name)
+    def __init__(self, name: str, directory: Path):
+        super().__init__(name, directory)
         self.preferred_food = PREFERRED_FOOD_CROCODILE
         self._bite_force = INITIAL_BITE_FORCE
 

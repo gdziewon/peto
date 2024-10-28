@@ -37,10 +37,12 @@ class PencManager:
         if self.data_file.exists():
             with self.data_file.open("r") as f:
                 penc_directories = json.load(f)
-                self.penc_list = [Penc(directory) for directory in penc_directories]
+                self.penc_list = [
+                    Penc(Path(directory)) for directory in penc_directories
+                ]
 
     def save_persistent_state(self):
         """Save the list of penc directories."""
-        penc_directories = [penc.directory for penc in self.penc_list]
+        penc_directories = [str(penc.directory) for penc in self.penc_list]
         with self.data_file.open("w") as f:
             json.dump(penc_directories, f)

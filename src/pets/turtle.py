@@ -1,12 +1,13 @@
-from utils.constants import INITIAL_SHELL_STRENGTH, PREFERRED_FOOD_TURTLE
+from pathlib import Path
 
 from pets.actions.eating import eat_action
 from pets.pet_base import Pet
+from utils.constants import INITIAL_SHELL_STRENGTH, PREFERRED_FOOD_TURTLE
 
 
 class Turtle(Pet):
-    def __init__(self, name: str):
-        super().__init__(name)
+    def __init__(self, name: str, directory: Path):
+        super().__init__(name, directory)
         self.preferred_food = PREFERRED_FOOD_TURTLE
         self._shell_strength = INITIAL_SHELL_STRENGTH
 
