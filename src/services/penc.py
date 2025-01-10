@@ -33,6 +33,9 @@ class Penc:
     def _write_pets(self, pets: list[dict]) -> bool:
         """Write the list of pets to the penc file."""
         try:
+            for pet in pets:
+                pet.pop("file", None)
+                pet.pop("body", None)
             self.penc_file.write_text(json.dumps(pets))
             return True
         except (FileNotFoundError, OSError):
@@ -47,8 +50,6 @@ class Penc:
         """Add a pet to the penc if it doesn't already exist."""
         pets = self._read_pets()
         pet_data = pet.__dict__.copy()
-        pet_data.pop("body")
-        pet_data.pop("file")
         pets.append(pet_data)
         if self._write_pets(pets):
             pet.save_art()

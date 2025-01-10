@@ -1,29 +1,13 @@
 #!/usr/bin/env python3
 import os
-import subprocess
 from argparse import ArgumentParser
 from pathlib import Path
 
-from services.penc_operations import PencOperations
-
 PETO = Path(__file__).resolve().parents[1]
-SERVICE_PID_FILE = PETO / ".peto_service.pid"
 os.environ["PETO"] = str(PETO)
 
-
-def start_service():
-    if SERVICE_PID_FILE.exists():
-        with SERVICE_PID_FILE.open("r") as f:
-            pid = int(f.read().strip())
-            if not (Path("/proc") / f"{pid}").exists():
-                SERVICE_PID_FILE.unlink()
-
-    subprocess.Popen(
-        [str(PETO / "src/services/peto_service.py")],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        start_new_session=True,
-    )
+from services.penc_operations import PencOperations
+from services.service_manager import start_service
 
 
 def create_penc(args, penc_op):

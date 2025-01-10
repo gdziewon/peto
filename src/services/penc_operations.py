@@ -1,4 +1,3 @@
-import os
 from functools import wraps
 from pathlib import Path
 from typing import List, Optional
@@ -8,6 +7,7 @@ from services.penc import Penc
 from services.penc_manager import PencManager
 from services.pet_factory import PetFactory
 from utils.constants import PENC_FILE_EXTENSION
+from utils.utils import get_tmp
 
 
 def check_penc(method):
@@ -27,7 +27,7 @@ class PencOperations:
     def __init__(self):
         self.penc = self._get_current_penc()
         self.manager = PencManager()
-        self.reload_signal = Path(os.environ["PETO"]) / ".reload"
+        self.reload_signal = Path(get_tmp() / ".reload")
 
     @staticmethod
     def _get_current_penc() -> Optional[Penc]:
@@ -72,7 +72,7 @@ class PencOperations:
         if pets:
             print("Pets in this penc:")
             for pet in pets:
-                print(pet.name)
+                print(f"{pet.name} {pet.emoji}")
 
     @check_penc
     def add_pet(self, pet_name: str, species: str):
