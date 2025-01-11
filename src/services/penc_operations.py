@@ -1,6 +1,9 @@
+# services/penc_operations.py
 from functools import wraps
 from pathlib import Path
 from typing import List, Optional
+
+from termcolor import colored
 
 from pets.pet_base import Pet
 from services.penc import Penc
@@ -12,14 +15,12 @@ from utils.utils import get_tmp
 
 def check_penc(method):
     """Decorator to ensure the penc exists before executing the method."""
-
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         if not self.penc:
-            print("No penc found in the current directory.")
+            print(colored("No penc found in the current directory.", "red"))
             return
         return method(self, *args, **kwargs)
-
     return wrapper
 
 
@@ -40,14 +41,14 @@ class PencOperations:
     def _get_all_pets(self) -> List[Pet]:
         pets = self.penc.get_all_pets() if self.penc else []
         if not pets:
-            print("No pets found in this penc.")
+            print(colored("No pets found in this penc.", "yellow"))
         return pets
 
     def _get_pet(self, pet_name: str) -> Optional[Pet]:
         """Fetch a pet by name; notify if not found."""
         pet = self.penc.get_pet(pet_name) if self.penc else None
         if not pet:
-            print(f"No pet named '{pet_name}' found in penc.")
+            print(colored(f"No pet named {colored(f'\'{pet_name}\'', 'yellow')} found in penc.", "red"))
         return pet
 
     def _get_pet_names(self) -> List[str]:
@@ -55,35 +56,51 @@ class PencOperations:
 
     def create_penc(self, penc_name: str = ".") -> Optional[Penc]:
         if self._get_current_penc():
-            print("Penc already exists")
+            print(colored("Penc already exists", "red"))
             return None
         penc = Penc(Path(penc_name))
         if penc.create_penc():
             self.manager.add_penc(penc)
             self.signal_reload()
-            print(f"Penc at '{penc.directory}' created.")
+            msg = (
+                colored("Penc at ", "green") +
+                colored(f"'{penc.directory}'", "yellow") +
+                colored(" created.", "green")
+            )
+            print(msg)
             return penc
-        print("Failed to create penc.")
+        print(colored("Failed to create penc.", "red"))
         return None
 
     @check_penc
     def list_pets(self):
         pets = self._get_all_pets()
         if pets:
-            print("Pets in this penc:")
+            print(colored("Pets in this penc:", "cyan"))
             for pet in pets:
-                print(f"{pet.name} {pet.emoji}")
+                # The pet name is highlighted in blue and its emoji in magenta.
+                print(colored(pet.name, "blue") + " " + colored(pet.emoji, "magenta"))
 
     @check_penc
     def add_pet(self, pet_name: str, species: str):
         if self.penc.get_pet(pet_name):
-            print(f"Pet {pet_name} already exists in penc {self.penc.name}.")
+            msg = (
+                colored("Pet ", "cyan") +
+                colored(f"'{pet_name}'", "yellow") +
+                colored(f" already exists in penc {self.penc.name}.", "cyan")
+            )
+            print(msg)
             return
         new_pet = PetFactory().create(pet_name, species, self.penc.directory)
         if new_pet and self.penc.add_pet(new_pet):
-            print(f"Pet '{pet_name}' added as a {new_pet.species}.")
+            msg = (
+                colored("Pet ", "green") +
+                colored(f"'{pet_name}'", "yellow") +
+                colored(f" added as a {new_pet.species}.", "green")
+            )
+            print(msg)
         else:
-            print(f"Failed to add pet '{pet_name}'.")
+            print(colored(f"Failed to add pet {colored(f'\'{pet_name}\'', 'yellow')}.", "red"))
 
     @check_penc
     def show_pet(self, pet_name: str):
@@ -102,7 +119,12 @@ class PencOperations:
         if pet:
             pet.eat()
             self.penc.update_pet_state(pet)
-            print(f"Fed {pet_name}.")
+            msg = (
+                colored("Fed ", "green") +
+                colored(f"'{pet_name}'", "yellow") +
+                colored(".", "green")
+            )
+            print(msg)
 
     @check_penc
     def play_with_pet(self, pet_name: str, toy: str):
@@ -110,33 +132,39 @@ class PencOperations:
         if pet:
             pet.play(toy)
             self.penc.update_pet_state(pet)
-            print(f"Played with {pet_name} using {toy}.")
+            msg = (
+                colored("Played with ", "green") +
+                colored(f"'{pet_name}'", "yellow") +
+                colored(f" using {toy}.", "green")
+            )
+            print(msg)
 
     def confirm_action(self, action: str) -> bool:
-        confirmation = input(f"{action} [y/N]: ")
+        confirmation = input(colored(f"{action} [y/N]: ", "cyan"))
         return confirmation.strip().lower() == "y"
 
     @check_penc
     def kill_pet(self, pet_name: str):
         pet = self._get_pet(pet_name)
         if pet:
-            if self.confirm_action(f"Are you sure you want to kill {pet_name}?"):
+            if self.confirm_action(f"Are you sure you want to kill {colored(f'\'{pet_name}\'', 'yellow')}?"):
                 if self.penc.kill_pet(pet_name):
-                    print(f"You monster, you killed {pet_name}. RIP.")
+                    print(colored(f"You monster, you killed {colored(f'\'{pet_name}\'', 'yellow')}. RIP.", "red"))
                 else:
-                    print("Failed to kill pet.")
+                    print(colored("Failed to kill pet.", "red"))
             else:
-                print(f"Killing aborted. {pet_name} is safe.")
+                print(colored(f"Killing aborted. {colored(f'\'{pet_name}\'', 'yellow')} is safe.", "yellow"))
 
     @check_penc
     def kill_all_pets(self):
         pets = self._get_all_pets()
         if pets:
-            print("Pets to be killed:")
+            print(colored("Pets to be killed:", "red"))
             for pet in pets:
-                print(pet.name)
+                print(colored(pet.name, "red"))
             if self.confirm_action("Kill all"):
                 if self.penc.kill_all_pets():
-                    print("You disgust me, you killed all the pets... RIP.")
+                    print(colored("You disgust me, you killed all the pets... RIP.", "red"))
                 else:
-                    print("Failed to kill all pets.")
+                    print(colored("Failed to kill all pets.", "red"))
+

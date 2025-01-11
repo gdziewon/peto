@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from termcolor import colored
+
 from pets.actions.eating import eat_action
 from pets.actions.playing import play_action
 from pets.pet_base import Pet
@@ -20,7 +22,7 @@ class Frog(Pet):
         eat_action(self)
 
     def play(self, toy):
-        print(f"{self.name} is jumping around")
+        print(colored(f"{self.name} is jumping around", "magenta"))
         play_action(self, toy)
 
     def update(self):

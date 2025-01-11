@@ -2,6 +2,8 @@ import random
 from abc import ABC, abstractmethod
 from pathlib import Path
 
+from termcolor import colored
+
 from pets.art.art_dict import art
 from utils.constants import (
     HEALTH_LOSS_RATE,
@@ -40,22 +42,39 @@ class Pet(ABC):
     def save_art(self):
         self.file.write_text(self.body)
 
+    def get_color(value: int) -> str:
+        return "green" if value > 70 else "yellow" if value > 40 else "red"
+
     @abstractmethod
     def show(self) -> None:
+        """
+        Display the creature's information with colored output.
+        """
         self.update()
-        print(self.body)
-        print(f"Name: {self.name}")
-        print(f"Species: {self.species}")
-        print(f"Age: {int(self.age)}")
-        print(f"Health: {int(self.health)}/100")
-        print(f"Mood: {int(self.mood)}/100")
-        print(f"Hunger: {int(self.hunger)}/100")
+
+        print(colored(self.body, "green"), "\n")
+
+        details = [
+            ("Name: ", self.name, "blue"),
+            ("Species: ", self.species, "magenta"),
+            ("Age: ", f"{int(self.age)}", "yellow"),
+            ("Health: ", f"{int(self.health)}/100", Pet.get_color(int(self.health))),
+            ("Mood: ", f"{int(self.mood)}/100", Pet.get_color(int(self.mood))),
+            (
+                "Hunger: ",
+                f"{int(self.hunger)}/100",
+                Pet.get_color(100 - int(self.hunger)),
+            ),
+        ]
+
+        for label, value, color in details:
+            print(colored(label, "cyan") + colored(value, color))
 
     @abstractmethod
     def update(self):
-        self.health -= (self.hunger - 50) * 1000 * HEALTH_LOSS_RATE
         self.hunger += HUNGER_GAIN_RATE * 1000
-
+        if self.hunger >= 100:
+            self.health -= HEALTH_LOSS_RATE
         self.mood -= (2 * self.hunger) + 50 - self.health * 1000 * MOOD_LOSS_RATE
         self._minutes += 1
         self._age = self._minutes / 60
